@@ -2101,22 +2101,18 @@ angular.module('a8m.filter-watcher', [])
        * @returns {string}
        */
       function getHashKey(fName, args) {
-        function replacerFactory() {
-          var cache = [];
-          return function(key, val) {
-            if(isObject(val) && !isNull(val)) {
-              if (~cache.indexOf(val)) return '[Circular]';
-              cache.push(val)
-            }
-            if($window == val) return '$WINDOW';
-            if($window.document == val) return '$DOCUMENT';
-            if(isScope(val)) return '$SCOPE';
-            return val;
-          }
+
+
+        // for the reasons of performance if array objects have ids
+
+        function idString(array) {
+          return array.reduce(function appendKey(id, element) {
+            return id + element.id;
+          }, '');
         }
-        return [fName, JSON.stringify(args, replacerFactory())]
-          .join('#')
-          .replace(/"/g,'');
+
+        return [fName, idString(args[0])]
+          .join('#');
       }
 
       /**
